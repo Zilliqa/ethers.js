@@ -54,7 +54,7 @@ export declare class Signature {
      *  It is normalized to the values ``27`` or ``28`` for legacy
      *  purposes.
      */
-    get v(): 27 | 28;
+    get v(): number;
     set v(value: BigNumberish);
     /**
      *  The EIP-155 ``v`` for legacy transactions. For non-legacy
@@ -88,7 +88,7 @@ export declare class Signature {
     /**
      *  @private
      */
-    constructor(guard: any, r: string, s: string, v: 27 | 28);
+    constructor(guard: any, r: string, s: string, v: number);
     /**
      *  Returns a new identical [[Signature]].
      */
@@ -122,7 +122,7 @@ export declare class Signature {
      *    //_result:
      *
      */
-    static getChainIdV(chainId: BigNumberish, v: 27 | 28): bigint;
+    static getChainIdV(chainId: BigNumberish, v: number): bigint;
     /**
      *  Compute the normalized legacy transaction ``v`` from a ``yParirty``,
      *  a legacy transaction ``v`` or a legacy [[link-eip-155]] transaction.
@@ -144,7 +144,7 @@ export declare class Signature {
      *    Signature.getNormalizedV(5)
      *    //_error:
      */
-    static getNormalizedV(v: BigNumberish): 27 | 28;
+    static getNormalizedV(v: BigNumberish): number;
     /**
      *  Creates a new [[Signature]].
      *

@@ -62,7 +62,7 @@ function toUint256(value: BigNumberish): string {
 export class Signature {
     #r: string;
     #s: string;
-    #v: 27 | 28;
+    #v: number;
     #networkV: null | bigint;
 
     /**
@@ -83,8 +83,9 @@ export class Signature {
     get s(): string { return this.#s; }
     set s(_value: BytesLike) {
         assertArgument(dataLength(_value) === 32, "invalid s", "value", _value);
-        const value = hexlify(_value);
-        assertArgument(parseInt(value.substring(0, 3)) < 8, "non-canonical s", "value", value);
+      const value = hexlify(_value);
+        /* Zilliqa has a large number of non-canonical signatures */
+        /* assertArgument(parseInt(value.substring(0, 3)) < 8, "non-canonical s", "value", value); */
         this.#s = value;
     }
 
@@ -98,10 +99,11 @@ export class Signature {
      *  It is normalized to the values ``27`` or ``28`` for legacy
      *  purposes.
      */
-    get v(): 27 | 28 { return this.#v; }
+  get v(): number { return this.#v; }
     set v(value: BigNumberish) {
-        const v = getNumber(value, "value");
-        assertArgument(v === 27 || v === 28, "invalid v", "v", value);
+      const v = getNumber(value, "value");
+      /* Zilliqa also has quite a lot of these, apparently */
+      /* assertArgument(v === 27 || v === 28, "invalid v", "v", value); */
         this.#v = v;
     }
 
@@ -158,7 +160,7 @@ export class Signature {
     /**
      *  @private
      */
-    constructor(guard: any, r: string, s: string, v: 27 | 28) {
+    constructor(guard: any, r: string, s: string, v: number) {
         assertPrivate(guard, _guard, "Signature");
         this.#r = r;
         this.#s = s;
@@ -227,7 +229,7 @@ export class Signature {
      *    //_result:
      *
      */
-    static getChainIdV(chainId: BigNumberish, v: 27 | 28): bigint {
+    static getChainIdV(chainId: BigNumberish, v: number): bigint {
         return (getBigInt(chainId) * BN_2) + BigInt(35 + v - 27);
     }
 
@@ -252,13 +254,13 @@ export class Signature {
      *    Signature.getNormalizedV(5)
      *    //_error:
      */
-    static getNormalizedV(v: BigNumberish): 27 | 28 {
+    static getNormalizedV(v: BigNumberish): number {
         const bv = getBigInt(v);
 
         if (bv === BN_0 || bv === BN_27) { return 27; }
         if (bv === BN_1 || bv === BN_28) { return 28; }
 
-        assertArgument(bv >= BN_35, "invalid v", "v", v);
+        /*assertArgument(bv >= BN_35, "invalid v", "v", v); */
 
         // Otherwise, EIP-155 v means odd is 27 and even is 28
         return (bv & BN_1) ? 27: 28;
@@ -294,7 +296,7 @@ export class Signature {
             if (bytes.length === 65) {
                 const r = hexlify(bytes.slice(0, 32));
                 const s = bytes.slice(32, 64);
-                assertError((s[0] & 0x80) === 0, "non-canonical s");
+                /* assertError((s[0] & 0x80) === 0, "non-canonical s"); */
                 const v = Signature.getNormalizedV(bytes[64]);
                 return new Signature(_guard, r, hexlify(s), v);
             }
@@ -322,10 +324,10 @@ export class Signature {
 
             assertError(false, "missing s");
         })(sig.s, sig.yParityAndS);
-        assertError((getBytes(s)[0] & 0x80) == 0, "non-canonical s");
+        /* assertError((getBytes(s)[0] & 0x80) == 0, "non-canonical s"); */
 
         // Get v; by any means necessary (we check consistency below)
-        const { networkV, v } = (function(_v?: BigNumberish, yParityAndS?: string, yParity?: Numeric): { networkV?: bigint, v: 27 | 28 } {
+        const { networkV, v } = (function(_v?: BigNumberish, yParityAndS?: string, yParity?: Numeric): { networkV?: bigint, v: number} {
             if (_v != null) {
                 const v = getBigInt(_v);
                 return {
