@@ -6616,7 +6616,8 @@ const __$G = (typeof globalThis !== 'undefined' ? globalThis: typeof window !== 
         set s(_value) {
             assertArgument(dataLength(_value) === 32, "invalid s", "value", _value);
             const value = hexlify(_value);
-            assertArgument(parseInt(value.substring(0, 3)) < 8, "non-canonical s", "value", value);
+            /* Zilliqa has a large number of non-canonical signatures */
+            /* assertArgument(parseInt(value.substring(0, 3)) < 8, "non-canonical s", "value", value); */
             this.#s = value;
         }
         /**
@@ -6632,7 +6633,8 @@ const __$G = (typeof globalThis !== 'undefined' ? globalThis: typeof window !== 
         get v() { return this.#v; }
         set v(value) {
             const v = getNumber(value, "value");
-            assertArgument(v === 27 || v === 28, "invalid v", "v", value);
+            /* Zilliqa also has quite a lot of these, apparently */
+            /* assertArgument(v === 27 || v === 28, "invalid v", "v", value); */
             this.#v = v;
         }
         /**
@@ -6783,7 +6785,7 @@ const __$G = (typeof globalThis !== 'undefined' ? globalThis: typeof window !== 
             if (bv === BN_1$3 || bv === BN_28$1) {
                 return 28;
             }
-            assertArgument(bv >= BN_35$1, "invalid v", "v", v);
+            /*assertArgument(bv >= BN_35, "invalid v", "v", v); */
             // Otherwise, EIP-155 v means odd is 27 and even is 28
             return (bv & BN_1$3) ? 27 : 28;
         }
@@ -6814,7 +6816,7 @@ const __$G = (typeof globalThis !== 'undefined' ? globalThis: typeof window !== 
                 if (bytes.length === 65) {
                     const r = hexlify(bytes.slice(0, 32));
                     const s = bytes.slice(32, 64);
-                    assertError((s[0] & 0x80) === 0, "non-canonical s");
+                    /* assertError((s[0] & 0x80) === 0, "non-canonical s"); */
                     const v = Signature.getNormalizedV(bytes[64]);
                     return new Signature(_guard$3, r, hexlify(s), v);
                 }
@@ -6840,7 +6842,7 @@ const __$G = (typeof globalThis !== 'undefined' ? globalThis: typeof window !== 
                 }
                 assertError(false, "missing s");
             })(sig.s, sig.yParityAndS);
-            assertError((getBytes(s)[0] & 0x80) == 0, "non-canonical s");
+            /* assertError((getBytes(s)[0] & 0x80) == 0, "non-canonical s"); */
             // Get v; by any means necessary (we check consistency below)
             const { networkV, v } = (function (_v, yParityAndS, yParity) {
                 if (_v != null) {
